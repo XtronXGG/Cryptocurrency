@@ -8,7 +8,7 @@ if "blockchain" not in st.session_state:
 st.set_page_config(page_title="💰 EduCoin Classroom", layout="wide")
 st.title("💰 Classroom Cryptocurrency (EduCoin)")
 
-# Metrics
+# ---------------- Metrics ----------------
 users = list(set([b.sender for b in st.session_state.blockchain.chain] +
                  [b.receiver for b in st.session_state.blockchain.chain]))
 users = [u for u in users if u != "System"]
@@ -28,12 +28,13 @@ if check_user.strip():
 st.subheader("🏆 Teacher Reward Coins")
 teacher_name_reward = st.text_input("Teacher Name", key="teacher_reward")
 student_name_reward = st.text_input("Student Name to reward", key="student_reward")
-if st.button("Reward 1 Coin"):
-    if teacher_name_reward.strip() and student_name_reward.strip():
-        st.session_state.blockchain.add_block(sender=teacher_name_reward, receiver=student_name_reward, amount=1)
-        st.success(f"1 EduCoin rewarded to {student_name_reward} by {teacher_name_reward}")
+reward_amount = st.number_input("Coins to Reward", min_value=1, step=1, key="reward_amount")
+if st.button("Reward Coins"):
+    if teacher_name_reward.strip() and student_name_reward.strip() and reward_amount > 0:
+        st.session_state.blockchain.add_block(sender=teacher_name_reward, receiver=student_name_reward, amount=reward_amount)
+        st.success(f"{reward_amount} EduCoins rewarded to {student_name_reward} by {teacher_name_reward}")
     else:
-        st.warning("Enter both teacher and student names.")
+        st.warning("Enter all fields correctly.")
 
 # ---------------- Mint Coins ----------------
 st.subheader("🪙 Mint Coins (Add Money)")
@@ -90,3 +91,12 @@ for block in reversed(st.session_state.blockchain.chain):
         st.write(f"Timestamp: {block.timestamp}")
         st.write(f"Hash: {block.hash}")
         st.write(f"Previous Hash: {block.previous_hash}")
+
+# ---------------- Summary of All Users ----------------
+st.subheader("📌 EduCoin Summary: All Users")
+user_balances = {user: st.session_state.blockchain.get_balance(user) for user in users}
+if user_balances:
+    for user, bal in user_balances.items():
+        st.write(f"{user}: {bal} EduCoins")
+else:
+    st.info("No users with coins yet.")
