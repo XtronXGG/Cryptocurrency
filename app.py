@@ -11,7 +11,7 @@ class Block:
         self.amount = amount
         self.previous_hash = previous_hash
         self.hash = self.calculate_hash()
-        self.transaction_id = str(uuid.uuid4())  # Unique transaction ID
+        self.transaction_id = str(uuid.uuid4())
 
     def calculate_hash(self):
         block_string = f"{self.index}{self.timestamp}{self.sender}{self.receiver}{self.amount}{self.previous_hash}"
@@ -60,8 +60,6 @@ class Blockchain:
                 users[block.sender] = 0
             users[block.receiver] += block.amount
             users[block.sender] -= block.amount
-        # Remove system user
         users.pop("System", None)
-        # Sort descending
         leaderboard = sorted(users.items(), key=lambda x: x[1], reverse=True)
         return leaderboard
